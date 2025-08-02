@@ -71,3 +71,6 @@ def test_login():
     data = response.json()
     assert "access_token" in data
     assert data["token_type"] == "bearer" 
+
+def test_new():
+    pass
