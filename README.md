@@ -2,6 +2,8 @@
 
 A modern full-stack todo application built with React, FastAPI, and PostgreSQL.
 
+🚀 **CI/CD Status**: Testing deployment pipeline - Last updated: 2025-08-02
+
 ## Tech Stack
 
 ### Backend
