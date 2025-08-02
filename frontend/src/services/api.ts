@@ -1,6 +1,24 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080';
+// Use environment variable or fallback to localhost for development
+// In production, use the same host as the frontend but on port 8080
+const getApiBaseUrl = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // For development
+  if (import.meta.env.DEV) {
+    return 'http://localhost:8080';
+  }
+  
+  // For production, use the same host as the frontend
+  const protocol = window.location.protocol;
+  const hostname = window.location.hostname;
+  return `${protocol}//${hostname}:8080`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
