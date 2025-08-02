@@ -213,3 +213,4 @@ The frontend automatically connects to the backend at `http://localhost:8000`.
 ## License
 
 This project is open source and available under the MIT License. 
+***
