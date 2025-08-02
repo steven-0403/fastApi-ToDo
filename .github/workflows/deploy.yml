@@ -19,7 +19,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         source: "."
-        target: "~/your-app-folder"
+        target: "~/fastapi-todo-app"
 
     - name: Deploy app via SSH
       uses: appleboy/ssh-action@v1.0.0
@@ -28,6 +28,6 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_KEY }}
         script: |
-          cd ~/your-app-folder
-          docker-compose down
+          cd ~/fastapi-todo-app
+          docker-compose down || true
           docker-compose up -d --build
