@@ -44,5 +44,23 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         script: |
           cd ~/fastapi-todo-app
-          docker-compose down || true
-          docker-compose up -d --build
+          
+          echo "=== Installing Docker Compose if needed ==="
+          if ! command -v docker-compose &> /dev/null; then
+            echo "Installing Docker Compose..."
+            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          fi
+          
+          echo "=== Adding user to docker group ==="
+          sudo usermod -aG docker ubuntu || true
+          
+          echo "=== Stopping existing containers ==="
+          sudo docker-compose -f docker-compose.simple.yml down || true
+          
+          echo "=== Building and starting services ==="
+          sudo docker-compose -f docker-compose.simple.yml up -d --build
+          
+          echo "=== Checking service status ==="
+          sleep 10
+          sudo docker-compose -f docker-compose.simple.yml ps

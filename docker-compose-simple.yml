@@ -4,11 +4,9 @@ services:
     environment:
       POSTGRES_DB: todoapp
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_PASSWORD: postgres
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    secrets:
-      - postgres_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d todoapp"]
       interval: 30s
@@ -37,7 +35,7 @@ services:
       target: production
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/todoapp
-      - SECRET_KEY_FILE=/run/secrets/secret_key
+      - SECRET_KEY=your-super-secret-key-change-this-in-production-please
       - ALGORITHM=HS256
       - ACCESS_TOKEN_EXPIRE_MINUTES=30
       - ENVIRONMENT=production
@@ -46,8 +44,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    secrets:
-      - secret_key
     restart: unless-stopped
     networks:
       - app-network
@@ -64,29 +60,9 @@ services:
     networks:
       - app-network
 
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - frontend
-      - backend
-    restart: unless-stopped
-    networks:
-      - app-network
-
 volumes:
   postgres_data:
   redis_data:
-
-secrets:
-  postgres_password:
-    file: ./secrets/postgres_password.txt
-  secret_key:
-    file: ./secrets/secret_key.txt
 
 networks:
   app-network:
