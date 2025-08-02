@@ -2,7 +2,7 @@ name: Deploy to EC2
 
 on:
   push:
-    branches: [main]  # or whatever branch you're working on
+    branches: [main]
 
 jobs:
   deploy:
@@ -20,6 +20,21 @@ jobs:
         key: ${{ secrets.EC2_KEY }}
         source: "."
         target: "~/fastapi-todo-app"
+
+    - name: Debug - Check EC2 setup
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          echo "=== Checking copied files ==="
+          ls -la ~/fastapi-todo-app/
+          echo "=== Checking Docker installation ==="
+          docker --version || echo "Docker not found"
+          docker-compose --version || echo "Docker Compose not found"
+          echo "=== Checking Docker service ==="
+          sudo systemctl status docker || echo "Docker service not running"
 
     - name: Deploy app via SSH
       uses: appleboy/ssh-action@v1.0.0
