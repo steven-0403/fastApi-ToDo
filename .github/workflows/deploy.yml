@@ -56,11 +56,34 @@ jobs:
           sudo usermod -aG docker ubuntu || true
           
           echo "=== Stopping existing containers ==="
-          sudo docker-compose -f docker-compose.simple.yml down || true
+          sudo docker-compose -f docker-compose-simple.yml down || true
           
           echo "=== Building and starting services ==="
-          sudo docker-compose -f docker-compose.simple.yml up -d --build
+          sudo docker-compose -f docker-compose-simple.yml up -d --build
           
           echo "=== Checking service status ==="
           sleep 10
-          sudo docker-compose -f docker-compose.simple.yml ps
+          sudo docker-compose -f docker-compose-simple.yml ps
+
+    - name: Show Access URLs
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          echo "=================================="
+          echo "🎉 DEPLOYMENT SUCCESSFUL!"
+          echo "=================================="
+          echo "Your application is now running at:"
+          echo "🌐 Frontend: http://${{ secrets.EC2_HOST }}:80"
+          echo "🔗 Backend API: http://${{ secrets.EC2_HOST }}:8080"
+          echo "📚 API Docs: http://${{ secrets.EC2_HOST }}:8080/docs"
+          echo "=================================="
+          echo "📊 Container Status:"
+          sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+          echo "=================================="
+          echo "🔧 If you can't access the app, check your EC2 Security Group:"
+          echo "   - Allow inbound traffic on port 80 (HTTP)"
+          echo "   - Allow inbound traffic on port 8080 (API)"
+          echo "=================================="
