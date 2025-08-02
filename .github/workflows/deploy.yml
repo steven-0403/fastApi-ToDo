@@ -82,8 +82,34 @@ jobs:
           echo "=================================="
           echo "📊 Container Status:"
           sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+          echo ""
+          echo "📋 All Containers (including stopped):"
+          sudo docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
+          echo ""
+          echo "🔍 Container Logs (last 20 lines each):"
+          echo "--- Frontend Logs ---"
+          sudo docker logs --tail 20 fastapi-todo-app-frontend-1 2>/dev/null || echo "Frontend container not found"
+          echo "--- Backend Logs ---"
+          sudo docker logs --tail 20 fastapi-todo-app-backend-1 2>/dev/null || echo "Backend container not found"
+          echo "--- Postgres Logs ---"
+          sudo docker logs --tail 20 fastapi-todo-app-postgres-1 2>/dev/null || echo "Postgres container not found"
+          echo "--- Redis Logs ---"
+          sudo docker logs --tail 20 fastapi-todo-app-redis-1 2>/dev/null || echo "Redis container not found"
           echo "=================================="
-          echo "🔧 If you can't access the app, check your EC2 Security Group:"
-          echo "   - Allow inbound traffic on port 80 (HTTP)"
-          echo "   - Allow inbound traffic on port 8080 (API)"
+          echo "🔧 If containers are stopped, restart with:"
+          echo "   cd ~/fastapi-todo-app && sudo docker-compose -f docker-compose-simple.yml up -d"
           echo "=================================="
+
+    - name: Restart App if Containers Stopped
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_KEY }}
+        script: |
+          cd ~/fastapi-todo-app
+          echo "🔄 Ensuring all containers are running..."
+          sudo docker-compose -f docker-compose-simple.yml up -d
+          sleep 5
+          echo "📊 Final Container Status:"
+          sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
