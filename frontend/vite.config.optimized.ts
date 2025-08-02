@@ -17,7 +17,7 @@ export default defineConfig({
   // Development server configuration
   server: {
     host: '0.0.0.0',
-    port: 3000,
+    port: 3001,
     open: false,
     // Enable HTTP/2 for better performance
     https: false,
